@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交互式《矛盾论》探索</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Visualization & Content Choices: 
+        - Introduction: Text. Goal: Inform.
+        - Core Concepts: Text, simple HTML/CSS visual aids. Goal: Inform, Explain. Interaction: Hover/click for details.
+        - Analysis Methodology: Text, HTML table. Goal: Organize, Inform.
+        - Quantifying Principal Contradiction (CIN): Input forms, text output, Bar Chart (Chart.js) for primariness. Interaction: User input, calculate button. Goal: Explore, Compare. Library: Chart.js.
+        - Quantifying Principal Aspect (DI): Input forms/sliders, Grouped Bar Chart (Chart.js) for DI scores. Interaction: User input, calculate button. Goal: Explore, Compare. Library: Chart.js.
+        - Dynamics & Transformation: Text, simple JS interaction to show DI shift. Goal: Illustrate change.
+        - Conclusion: Text. Goal: Summarize.
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .tab-button { transition: all 0.3s ease; }
+        .tab-button.active { border-color: #0284c7; color: #0284c7; background-color: #f0f9ff; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+        h2 { font-size: 1.75rem; font-weight: 600; margin-bottom: 1rem; color: #0369a1; }
+        h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #075985; }
+        p, li { line-height: 1.75; color: #334155; }
+        .concept-box { background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 1rem; border-radius: 0.375rem; margin-bottom: 1rem; }
+        .interactive-section { background-color: #f1f5f9; padding: 1.5rem; border-radius: 0.5rem; margin-top: 1.5rem; }
+        .input-label { display: block; margin-bottom: 0.25rem; font-weight: 500; color: #475569; }
+        .text-input, .number-input { width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.375rem; margin-bottom: 0.75rem; }
+        .action-button { background-color: #0ea5e9; color: white; padding: 0.6rem 1.2rem; border-radius: 0.375rem; font-weight: 500; cursor: pointer; transition: background-color 0.2s; }
+        .action-button:hover { background-color: #0284c7; }
+        .table-auto { width: auto; }
+        th, td { padding: 0.5rem 1rem; border: 1px solid #e2e8f0; text-align: left; }
+        th { background-color: #f1f5f9; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header class="bg-sky-700 text-white p-6 shadow-md">
+        <div class="container mx-auto max-w-6xl">
+            <h1 class="text-3xl font-bold">交互式《矛盾论》探索</h1>
+            <p class="mt-1 text-sky-100">深入理解毛泽东的矛盾学说及其量化尝试</p>
+        </div>
+    </header>
+
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto max-w-6xl flex flex-wrap justify-center space-x-2 sm:space-x-4 p-3">
+            <button class="tab-button active text-sm sm:text-base px-3 py-2 font-medium rounded-md border-b-2 border-transparent hover:bg-sky-50 hover:text-sky-600" data-tab="introduction">导论</button>
+            <button class="tab-button text-sm sm:text-base px-3 py-2 font-medium rounded-md border-b-2 border-transparent hover:bg-sky-50 hover:text-sky-600" data-tab="core-concepts">核心概念</button>
+            <button class="tab-button text-sm sm:text-base px-3 py-2 font-medium rounded-md border-b-2 border-transparent hover:bg-sky-50 hover:text-sky-600" data-tab="analysis-methodology">分析方法</button>
+            <button class="tab-button text-sm sm:text-base px-3 py-2 font-medium rounded-md border-b-2 border-transparent hover:bg-sky-50 hover:text-sky-600" data-tab="quantify-principal-contradiction">量化主要矛盾</button>
+            <button class="tab-button text-sm sm:text-base px-3 py-2 font-medium rounded-md border-b-2 border-transparent hover:bg-sky-50 hover:text-sky-600" data-tab="quantify-principal-aspect">量化主要方面</button>
+            <button class="tab-button text-sm sm:text-base px-3 py-2 font-medium rounded-md border-b-2 border-transparent hover:bg-sky-50 hover:text-sky-600" data-tab="dynamics-transformation">动态与转化</button>
+            <button class="tab-button text-sm sm:text-base px-3 py-2 font-medium rounded-md border-b-2 border-transparent hover:bg-sky-50 hover:text-sky-600" data-tab="conclusion">总结</button>
+        </div>
+    </nav>
+
+    <main class="container mx-auto max-w-4xl p-6">
+        <section id="introduction" class="content-section active">
+            <h2>导论：走进《矛盾论》</h2>
+            <p>《矛盾论》是毛泽东同志于1937年撰写的哲学著作，是马克思主义唯物辩证法的重要文献。它深刻阐述了事物矛盾的普遍性与特殊性、主要矛盾和次要矛盾、矛盾的主要方面和次要方面等核心概念，为我们认识世界、分析问题、解决问题提供了强大的思想武器。</p>
+            <p>本应用旨在通过现代的交互方式，帮助您更直观地理解《矛盾论》中的核心思想，并探索一种将其部分方法论进行量化分析的尝试。这里的“量化”并非要取代哲学的深刻思辨，而是作为一种辅助理解和分析复杂系统的工具。通过互动操作，您可以体验如何识别和评估不同情境下的矛盾及其构成要素。</p>
+            <p>请注意，任何对哲学思想的量化都存在其局限性。“具体问题具体分析”是《矛盾论》的灵魂，也是我们运用任何模型或工具时必须牢记的根本原则。</p>
+        </section>
+
+        <section id="core-concepts" class="content-section">
+            <h2>核心概念解析</h2>
+            <p>《矛盾论》提出了一系列理解事物运动和发展的核心概念。这些概念共同构成了唯物辩证法的基石。本部分将介绍其中几个关键概念，并通过简单的交互来加深理解。</p>
+            
+            <div class="concept-box">
+                <h3>1. 矛盾的普遍性与特殊性</h3>
+                <p><strong>普遍性（绝对性）：</strong>矛盾存在于一切事物的发展过程中，并贯穿于每一事物发展过程的始终。“没有什么事物是不包含矛盾的，没有矛盾就没有世界。”</p>
+                <p><strong>特殊性（相对性）：</strong>每种事物的矛盾都有其特殊性，构成一事物区别于他事物的特殊本质。不同性质的矛盾，只能用不同性质的方法来解决。“对症下药”正是这一思想的体现。</p>
+                <p class="mt-2"><em>思考：</em>普遍性寓于特殊性之中。例如，“生命”是一个普遍概念，但每种生物（特殊性）的生命形态和矛盾都各不相同。</p>
+            </div>
+
+            <div class="concept-box">
+                <h3>2. 矛盾的同一性与斗争性</h3>
+                <p><strong>同一性：</strong>指矛盾双方相互依存、互为存在的前提，并在一定条件下相互转化。“有无相生，难易相成，长短相形”。</p>
+                <p><strong>斗争性：</strong>指矛盾双方互相排斥、互相斗争的倾向。斗争是绝对的、无条件的，贯穿于事物发展的始终，是事物变化发展的动力。</p>
+                <p class="mt-2"><em>关系：</em>有条件的、相对的同一性和无条件的、绝对的斗争性相结合，构成了一切事物的矛盾运动。斗争性寓于同一性之中。</p>
+            </div>
+
+            <div class="concept-box">
+                <h3>3. 对抗在矛盾中的地位</h3>
+                <p><strong>对抗：</strong>是矛盾斗争的一种形式，但并非唯一形式。它通常指矛盾激化到一定程度时表现出的外部冲突。例如，战争是阶级矛盾对抗的一种形式。</p>
+                <p>《矛盾论》指出，有些矛盾具有公开的对抗性，有些则不具有。矛盾可以从非对抗性发展为对抗性，也可以从对抗性转化为非对抗性，这取决于具体的条件和斗争的形势。</p>
+            </div>
+             <p class="mt-4">通过理解这些核心概念，我们可以更深刻地把握事物发展的内在规律和复杂性。接下来的部分将探讨如何运用这些概念来分析和解决问题。</p>
+        </section>
+
+        <section id="analysis-methodology" class="content-section">
+            <h2>辩证分析方法论</h2>
+            <p>《矛盾论》不仅阐述了矛盾的客观存在，更重要的是提供了分析和解决矛盾的方法论。其核心在于“具体问题具体分析”。</p>
+
+            <h3>1. “具体问题具体分析”的元规则</h3>
+            <p>这是马克思主义活的灵魂。它要求我们反对主观性、片面性和表面性，必须深入研究矛盾的总体、矛盾诸方面的联系以及它们在不同发展阶段的特性。脱离具体分析，就不可能认识任何矛盾的特殊性，也就找不到解决矛盾的正确方法。</p>
+
+            <h3>2. 认识的逻辑顺序：从特殊到一般，再到特殊</h3>
+            <p>人类的认识过程总是：</p>
+            <ol class="list-decimal list-inside ml-4 my-2">
+                <li>从认识个别的、特殊的事物开始。</li>
+                <li>逐步概括、抽象，认识到同类事物的一般性质和规律。</li>
+                <li>再以这种一般的认识为指导，去研究更具体、更深入的尚未研究透彻的特殊事物。</li>
+            </ol>
+            <p>这是一个循环往复、不断深化的过程。例如，通过研究多种不同的植物（特殊），我们总结出植物生长的一般规律（光合作用、需要水和养分等）；然后运用这些一般规律去研究某种特定植物的特殊生长需求。</p>
+
+            <h3>3. “不同质的矛盾，用不同质的方法解决”</h3>
+            <p>由于矛盾具有特殊性，解决不同性质的矛盾必须采用不同的方法。例如，人民内部的矛盾和敌我矛盾的性质不同，解决的方法也应有所区别。下表列举了一些矛盾类型及其可能的解决思路（源自报告分析）：</p>
+            
+            <div class="overflow-x-auto mt-4">
+                <table class="min-w-full table-auto border-collapse border border-slate-300">
+                    <thead>
+                        <tr>
+                            <th>矛盾类型</th>
+                            <th>关键特征（可测量指标的思考方向）</th>
+                            <th>普遍解决方案类别（方法论）</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>经济矛盾</td>
+                            <td>生产力与生产关系、分配不均、市场失衡</td>
+                            <td>发展生产力、变革生产关系、政策调整</td>
+                        </tr>
+                        <tr>
+                            <td>政治矛盾</td>
+                            <td>阶级斗争、权力分配、制度冲突</td>
+                            <td>革命、改革、协商、法律修订</td>
+                        </tr>
+                        <tr>
+                            <td>社会矛盾</td>
+                            <td>城乡差距、贫富分化、文化冲突</td>
+                            <td>社会福利改革、教育普及、文化交流</td>
+                        </tr>
+                         <tr>
+                            <td>思想矛盾</td>
+                            <td>唯心与唯物、教条与经验</td>
+                            <td>批评与自我批评、理论创新、思想教育</td>
+                        </tr>
+                        <tr>
+                            <td>人与自然矛盾</td>
+                            <td>资源枯竭、环境污染、生态失衡</td>
+                            <td>科技创新、可持续发展、调整生产方式</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="mt-4">在分析具体问题时，关键步骤是识别出<strong>主要矛盾</strong>和<strong>矛盾的主要方面</strong>，这将指导我们集中力量解决关键问题。</p>
+        </section>
+
+        <section id="quantify-principal-contradiction" class="content-section">
+            <h2>量化主要矛盾：矛盾影响网络 (CIN)</h2>
+            <p>在复杂系统中，往往存在多个矛盾交织在一起。抓住其中的<strong>主要矛盾</strong>，对于解决问题至关重要，因为它“起着领导的、决定的作用”。本节提供一个简化的交互模型，尝试量化一组假设矛盾中的主要矛盾。</p>
+            <p>我们将构建一个“矛盾影响网络”（Contradiction Influence Network, CIN）。在这个网络中，每个矛盾是一个节点，它们之间的影响关系构成边。通过评估每个矛盾对其他矛盾的影响程度，我们可以识别出具有最高“主要性得分”的矛盾。</p>
+
+            <div class="interactive-section">
+                <h3>构建您的矛盾影响网络</h3>
+                <p class="mb-4 text-sm text-slate-600">请定义2到4个假设的矛盾，并设定它们之间的影响程度（0到1之间，0代表无影响，1代表决定性影响）。</p>
+                
+                <div id="cin-inputs-container" class="space-y-4">
+                    </div>
+                <button id="add-contradiction-btn" class="action-button mt-4 mr-2">添加矛盾</button>
+                <button id="calculate-cin-btn" class="action-button mt-4">计算主要矛盾</button>
+
+                <div id="cin-results-container" class="mt-6">
+                    <h3 id="cin-result-title" class="hidden">主要性得分：</h3>
+                    <div class="chart-container">
+                        <canvas id="cinChart"></canvas>
+                    </div>
+                    <p id="cin-interpretation" class="mt-4 text-sm text-slate-600"></p>
+                </div>
+            </div>
+            <p class="mt-4"><strong>解释：</strong>主要性得分越高，表明该矛盾在当前设定的网络中对其他矛盾的影响越大，可能越接近主要矛盾。这个模型是一个高度简化的示例，实际分析需要更复杂的权重和语境因素。</p>
+            <p>这个方法的核心思想是，一个矛盾如果对许多其他矛盾产生强烈影响，或者它影响了一些本身就具有高度影响力的矛盾，那么它就更可能是主要矛盾。这类似于PageRank算法的思想，但这里我们使用一个更简化的加权出度中心性作为示例。</p>
+        </section>
+
+        <section id="quantify-principal-aspect" class="content-section">
+            <h2>量化主要方面：支配力指数 (DI)</h2>
+            <p>任何矛盾都包含两个对立的方面。其中一个方面通常处于<strong>支配地位</strong>，它“规定着事物的性质”。识别矛盾的主要方面，有助于我们理解事物的当前状态和发展方向。本节提供一个交互模型，尝试量化一个假设矛盾中哪个方面是主要方面。</p>
+            <p>我们将使用“支配力指数”（Dominance Index, DI）。您可以为一个假设的矛盾（例如，“旧思想”与“新思想”）的两个方面，根据一系列“支配力指标”打分（1-10分）。模型将计算每个方面的总支配力指数。</p>
+
+            <div class="interactive-section">
+                <h3>评估矛盾双方的支配力</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                    <div>
+                        <label for="aspectAName" class="input-label">方面 A 名称:</label>
+                        <input type="text" id="aspectAName" class="text-input" value="旧事物">
+                    </div>
+                    <div>
+                        <label for="aspectBName" class="input-label">方面 B 名称:</label>
+                        <input type="text" id="aspectBName" class="text-input" value="新事物">
+                    </div>
+                </div>
+
+                <div id="di-indicators-container" class="space-y-4">
+                    </div>
+                
+                <button id="calculate-di-btn" class="action-button mt-6">计算支配力指数</button>
+
+                <div id="di-results-container" class="mt-6">
+                     <h3 id="di-result-title" class="hidden">支配力指数比较：</h3>
+                    <div class="chart-container">
+                        <canvas id="diChart"></canvas>
+                    </div>
+                    <p id="di-interpretation" class="mt-4 text-lg font-semibold text-center"></p>
+                </div>
+            </div>
+            <p class="mt-4"><strong>解释：</strong>支配力指数较高的一方，在当前设定的指标和权重下，被认为是矛盾的主要方面。这个模型同样是简化的，实际分析需要根据具体矛盾的性质选择和加权指标。</p>
+            <p>事物的性质主要由取得支配地位的矛盾的主要方面所规定。当矛盾的主要方面发生变化时，事物的性质也会随之改变。例如，在资本主义社会，资产阶级是矛盾的主要方面，规定了社会的资本主义性质；而在社会主义社会，无产阶级（或工人阶级）成为主要方面，规定了社会的社会主义性质。</p>
+        </section>
+
+        <section id="dynamics-transformation" class="content-section">
+            <h2>动态与转化：矛盾的演变</h2>
+            <p>《矛盾论》强调，矛盾的双方不是静止不变的，它们始终处于运动、斗争和转化的过程中。矛盾的主要方面和次要方面，以及主要矛盾和次要矛盾的地位，都可能随着条件的变化而发生转化。</p>
+
+            <h3>1. 量变与质变</h3>
+            <p>矛盾双方力量的消长是一个渐进的量变过程。当这种量变积累到一定程度，突破了某个临界点时，就会引起质变。质变表现为事物性质的根本变化，例如矛盾主要方面的易位，或者旧矛盾的解决和新矛盾的产生。</p>
+            <p>“新陈代谢是宇宙间普遍的永远不可抵抗的规律。”新事物代替旧事物，正是通过这种矛盾双方斗争、量变到质变的过程实现的。</p>
+
+            <h3>2. 条件的重要性</h3>
+            <p>矛盾的转化依赖于一定的条件。没有必要的条件，鸡蛋不能孵化成鸡，石头更不能。这些条件既包括事物内部的因素，也包括外部环境的影响。</p>
+            <p>例如，在和平时期，一个国家内部的阶级矛盾可能是主要的；但在外敌入侵的战争时期，民族矛盾（国家与侵略者之间的矛盾）就可能上升为主要矛盾，而国内原有的阶级矛盾则暂时退居次要地位。这种转化是由“战争”这一特定条件决定的。</p>
+            
+            <div class="interactive-section mt-6">
+                <h3>模拟转化（概念演示）</h3>
+                <p class="mb-4 text-sm text-slate-600">这是一个概念演示。假设我们正在观察“旧制度”与“新制度”的矛盾。初始状态下，“旧制度”凭借其资源控制和政治权力占据支配地位。随着时间推移，“新制度”通过思想传播和群众动员，力量逐渐增强。</p>
+                <div class="flex items-center space-x-4">
+                    <div class="flex-1">
+                        <label id="transformAspectOldLabel" class="block text-center font-medium text-lg">旧制度: <span id="transformOldScore">70</span></label>
+                        <div class="w-full bg-gray-300 rounded-full h-6 mt-1">
+                            <div id="transformOldBar" class="bg-red-500 h-6 rounded-full text-white text-xs flex items-center justify-center" style="width: 70%;">70%</div>
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <label id="transformAspectNewLabel" class="block text-center font-medium text-lg">新制度: <span id="transformNewScore">30</span></label>
+                        <div class="w-full bg-gray-300 rounded-full h-6 mt-1">
+                            <div id="transformNewBar" class="bg-green-500 h-6 rounded-full text-white text-xs flex items-center justify-center" style="width: 30%;">30%</div>
+                        </div>
+                    </div>
+                </div>
+                <button id="simulate-change-btn" class="action-button mt-4">模拟“新制度”力量增强</button>
+                <p id="transformation-status" class="mt-3 text-center font-semibold"></p>
+            </div>
+            <p class="mt-4">理解矛盾的动态性和转化的条件，对于我们预测事物发展趋势、把握变革时机、推动社会进步具有至关重要的意义。</p>
+        </section>
+
+        <section id="conclusion" class="content-section">
+            <h2>总结与展望</h2>
+            <p>《矛盾论》提供了一个深刻而系统的方法论框架，用以理解世界的复杂性和动态性。通过分析矛盾的普遍性与特殊性、主要矛盾与主要方面，以及它们之间的斗争与转化，我们可以更有效地认识问题、解决问题。</p>
+            
+            <h3>量化尝试的意义与局限</h3>
+            <p>本应用中提出的“矛盾影响网络”和“支配力指数”等量化模型，是对《矛盾论》思想的一种解读和应用尝试。其意义在于：</p>
+            <ul class="list-disc list-inside ml-4 my-2">
+                <li><strong>系统化分析：</strong> 为复杂问题提供一种结构化的分析思路。</li>
+                <li><strong>辅助决策：</strong> 帮助识别关键因素，为战略制定提供参考。</li>
+                <li><strong>教学与理解：</strong> 以更直观的方式展现抽象的哲学概念。</li>
+            </ul>
+            <p>然而，这种量化尝试也存在固有局限性：</p>
+            <ul class="list-disc list-inside ml-4 my-2">
+                <li><strong>简化性：</strong> 任何模型都是对现实的简化，难以完全捕捉哲学思想的丰富内涵和具体情境的复杂性。</li>
+                <li><strong>主观性：</strong> 指标的选择、权重的设定等环节不可避免地带有主观判断。</li>
+                <li><strong>数据依赖：</strong> 有效的量化分析依赖于准确、全面的数据，这在很多现实场景中难以获得。</li>
+                <li><strong>“具体问题具体分析”：</strong> 模型结果不能替代深入的、具体的、动态的矛盾分析。僵化套用模型是违背《矛盾论》精神的。</li>
+            </ul>
+
+            <h3>未来方向</h3>
+            <p>将辩证思维与现代分析工具相结合，是一个值得继续探索的方向。未来的研究可以考虑：</p>
+            <ul class="list-disc list-inside ml-4 my-2">
+                <li>更精细的动态模型，引入模糊逻辑、概率方法等。</li>
+                <li>结合案例研究，对模型进行验证和完善。</li>
+                <li>开发更友好的交互工具，辅助人们运用辩证思维分析现实问题。</li>
+            </ul>
+            <p>最终，学习和运用《矛盾论》，关键在于掌握其精神实质，将其作为一种观察世界、思考问题、指导实践的世界观和方法论，而不是一套刻板的公式。</p>
+        </section>
+    </main>
+
+    <footer class="text-center p-6 mt-10 border-t border-slate-200">
+        <p class="text-sm text-slate-500">&copy; 2024-2025 交互式《矛盾论》探索。基于毛泽东《矛盾论》及相关分析报告。</p>
+    </footer>
+
+    <script>
+        const tabs = document.querySelectorAll('.tab-button');
+        const sections = document.querySelectorAll('.content-section');
+        let cinChartInstance = null;
+        let diChartInstance = null;
+        let contradictions = [{ id: 1, name: "生产力落后" }, { id: 2, name: "分配不公" }];
+        const MAX_CONTRADICTIONS = 4;
+
+        const diIndicators = [
+            { id: 'rc', name: '资源控制', aspectA: 7, aspectB: 5, weight: 0.25 },
+            { id: 'pp', name: '政治权力', aspectA: 6, aspectB: 6, weight: 0.25 },
+            { id: 'ic', name: '思想文化影响', aspectA: 5, aspectB: 7, weight: 0.2 },
+            { id: 'os', name: '组织强度', aspectA: 8, aspectB: 4, weight: 0.15 },
+            { id: 'mc', name: '动员能力', aspectA: 4, aspectB: 8, weight: 0.15 }
+        ];
+
+        function switchTab(targetId) {
+            tabs.forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === targetId);
+            });
+            sections.forEach(section => {
+                section.classList.toggle('active', section.id === targetId);
+            });
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                switchTab(tab.dataset.tab);
+            });
+        });
+        
+        function wrapText(context, text, x, y, maxWidth, lineHeight) {
+            const words = text.split(' ');
+            let line = '';
+            for (let n = 0; n < words.length; n++) {
+                const testLine = line + words[n] + ' ';
+                const metrics = context.measureText(testLine);
+                const testWidth = metrics.width;
+                if (testWidth > maxWidth && n > 0) {
+                    context.fillText(line, x, y);
+                    line = words[n] + ' ';
+                    y += lineHeight;
+                } else {
+                    line = testLine;
+                }
+            }
+            context.fillText(line, x, y);
+        }
+        
+        Chart.defaults.plugins.tooltip.callbacks.label = function(context) {
+            let label = context.dataset.label || '';
+            if (label) {
+                label += ': ';
+            }
+            if (context.parsed.y !== null) {
+                label += context.parsed.y.toFixed(2);
+            }
+            return label;
+        };
+
+        Chart.defaults.plugins.legend.labels.boxWidth = 15;
+        Chart.defaults.font.size = 12;
+        Chart.defaults.maintainAspectRatio = false;
+
+
+        function renderCinInputs() {
+            const container = document.getElementById('cin-inputs-container');
+            container.innerHTML = ''; // Clear previous inputs
+
+            contradictions.forEach((c, i) => {
+                const div = document.createElement('div');
+                div.className = 'mb-3 p-3 border border-slate-300 rounded bg-white';
+                div.innerHTML = `
+                    <label for="c_name_${c.id}" class="input-label">矛盾 ${i + 1} 名称:</label>
+                    <input type="text" id="c_name_${c.id}" class="text-input" value="${c.name}">
+                `;
+                container.appendChild(div);
+            });
+
+            if (contradictions.length > 1) {
+                const influenceTitle = document.createElement('h4');
+                influenceTitle.className = "text-md font-semibold mt-4 mb-2 text-slate-700";
+                influenceTitle.textContent = "设置矛盾间影响程度 (0-1):";
+                container.appendChild(influenceTitle);
+
+                for (let i = 0; i < contradictions.length; i++) {
+                    for (let j = 0; j < contradictions.length; j++) {
+                        if (i === j) continue; // No self-influence in this simple model
+                        const div = document.createElement('div');
+                        div.className = 'mb-2 ml-2';
+                        div.innerHTML = `
+                            <label for="c_inf_${contradictions[i].id}_${contradictions[j].id}" class="text-sm text-slate-600">${contradictions[i].name} -> ${contradictions[j].name}:</label>
+                            <input type="number" id="c_inf_${contradictions[i].id}_${contradictions[j].id}" class="number-input w-20 ml-2" min="0" max="1" step="0.1" value="0.5">
+                        `;
+                        container.appendChild(div);
+                    }
+                }
+            }
+             document.getElementById('add-contradiction-btn').disabled = contradictions.length >= MAX_CONTRADICTIONS;
+        }
+
+        document.getElementById('add-contradiction-btn').addEventListener('click', () => {
+            if (contradictions.length < MAX_CONTRADICTIONS) {
+                const newId = contradictions.length > 0 ? Math.max(...contradictions.map(c => c.id)) + 1 : 1;
+                contradictions.push({ id: newId, name: `新矛盾 ${newId}` });
+                updateCinContradictionNamesFromInputs(); // Save current names before re-rendering
+                renderCinInputs();
+            }
+        });
+        
+        function updateCinContradictionNamesFromInputs() {
+            contradictions.forEach(c => {
+                const nameInput = document.getElementById(`c_name_${c.id}`);
+                if (nameInput) c.name = nameInput.value || `矛盾 ${c.id}`;
+            });
+        }
+
+
+        document.getElementById('calculate-cin-btn').addEventListener('click', () => {
+            updateCinContradictionNamesFromInputs(); // Ensure names are current for labels
+            if (contradictions.length === 0) {
+                 document.getElementById('cin-interpretation').textContent = "请至少定义一个矛盾。";
+                 if(cinChartInstance) cinChartInstance.destroy();
+                 document.getElementById('cin-result-title').classList.add('hidden');
+                return;
+            }
+
+            const primarinessScores = contradictions.map(c => ({ name: c.name, score: 0 }));
+            let totalInfluence = 0;
+
+            if (contradictions.length > 1) {
+                for (let i = 0; i < contradictions.length; i++) {
+                    let outDegreeScore = 0;
+                    for (let j = 0; j < contradictions.length; j++) {
+                        if (i === j) continue;
+                        const influenceInput = document.getElementById(`c_inf_${contradictions[i].id}_${contradictions[j].id}`);
+                        const influenceValue = influenceInput ? parseFloat(influenceInput.value) : 0;
+                        if (!isNaN(influenceValue) && influenceValue >= 0 && influenceValue <= 1) {
+                            outDegreeScore += influenceValue;
+                        }
+                    }
+                    primarinessScores[i].score = outDegreeScore;
+                    totalInfluence += outDegreeScore;
+                }
+            } else if (contradictions.length === 1) {
+                // Single contradiction, assign a base score or handle as per logic
+                primarinessScores[0].score = 1; // Arbitrary score for a single contradiction
+                totalInfluence = 1;
+            }
+
+
+            // Normalize scores (optional, but can be good for PageRank-like interpretations)
+            // For simplicity, we're using raw weighted out-degree here.
+            // If using PageRank, you'd iterate.
+
+            const ctx = document.getElementById('cinChart').getContext('2d');
+            if (cinChartInstance) {
+                cinChartInstance.destroy();
+            }
+            
+            document.getElementById('cin-result-title').classList.remove('hidden');
+
+            cinChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: primarinessScores.map(item => {
+                        // Truncate long labels for chart display
+                        const name = item.name;
+                        return name.length > 16 ? name.substring(0, 14) + '...' : name;
+                    }),
+                    datasets: [{
+                        label: '主要性得分',
+                        data: primarinessScores.map(item => item.score),
+                        backgroundColor: 'rgba(2, 132, 199, 0.6)', // sky-600
+                        borderColor: 'rgba(2, 132, 199, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: '得分' }
+                        },
+                        x: {
+                            ticks: {
+                                callback: function(value, index, values) {
+                                    const label = this.getLabelForValue(value); // Full label
+                                    if (label.length > 10) { // If label is too long
+                                        // This is a simplified wrap, might need more robust solution for many long labels
+                                        // return label.split(' '); // Attempt to split, Chart.js might handle array
+                                        return label.substring(0,8) + '...';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                     // Use full name for tooltip title
+                                    return primarinessScores[tooltipItems[0].dataIndex].name;
+                                },
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y.toFixed(2);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            if (totalInfluence > 0 || contradictions.length === 1) {
+                 let interpretationText = "得分反映了各矛盾在当前设定网络中的相对影响力。";
+                 if (primarinessScores.length > 0) {
+                    const maxScore = Math.max(...primarinessScores.map(s => s.score));
+                    const principalContradictions = primarinessScores.filter(s => s.score === maxScore);
+                    if (principalContradictions.length > 0 && maxScore > 0) {
+                        interpretationText += ` 当前来看，"${principalContradictions.map(c => c.name).join('" 和 "')}" 显示出最高的主要性。`;
+                    } else if (contradictions.length === 1 && primarinessScores[0].score > 0) {
+                         interpretationText += ` 仅定义一个矛盾时，其自身即为主要分析对象。`;
+                    } else if (primarinessScores.every(s => s.score === 0) && contradictions.length > 1) {
+                        interpretationText += " 所有定义矛盾的影响力均为0，或未正确设定影响。";
+                    }
+                 }
+                 document.getElementById('cin-interpretation').textContent = interpretationText;
+            } else if (contradictions.length > 0) {
+                 document.getElementById('cin-interpretation').textContent = "所有矛盾的影响力均为0，无法确定主要矛盾。请检查影响程度的设置。";
+            } else {
+                 document.getElementById('cin-interpretation').textContent = "";
+            }
+
+        });
+
+        function renderDiInputs() {
+            const container = document.getElementById('di-indicators-container');
+            container.innerHTML = '';
+            const aspectAName = document.getElementById('aspectAName').value || '方面 A';
+            const aspectBName = document.getElementById('aspectBName').value || '方面 B';
+
+            diIndicators.forEach(indicator => {
+                const div = document.createElement('div');
+                div.className = 'p-3 border border-slate-300 rounded bg-white';
+                div.innerHTML = `
+                    <h4 class="font-medium text-slate-700 mb-2">${indicator.name} (权重: ${indicator.weight * 100}%)</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="di_${indicator.id}_A" class="input-label text-sm">${aspectAName}:</label>
+                            <input type="number" id="di_${indicator.id}_A" class="number-input" min="0" max="10" step="1" value="${indicator.aspectA}" data-indicator-id="${indicator.id}" data-aspect="A">
+                        </div>
+                        <div>
+                            <label for="di_${indicator.id}_B" class="input-label text-sm">${aspectBName}:</label>
+                            <input type="number" id="di_${indicator.id}_B" class="number-input" min="0" max="10" step="1" value="${indicator.aspectB}" data-indicator-id="${indicator.id}" data-aspect="B">
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            
+            // Add event listeners to update indicator scores
+            container.querySelectorAll('input[type="number"]').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const id = e.target.dataset.indicatorId;
+                    const aspect = e.target.dataset.aspect;
+                    const value = parseInt(e.target.value);
+                    const ind = diIndicators.find(i => i.id === id);
+                    if (ind) {
+                        if (aspect === 'A') ind.aspectA = value;
+                        else if (aspect === 'B') ind.aspectB = value;
+                    }
+                });
+            });
+        }
+        
+        document.getElementById('aspectAName').addEventListener('change', renderDiInputs);
+        document.getElementById('aspectBName').addEventListener('change', renderDiInputs);
+
+
+        document.getElementById('calculate-di-btn').addEventListener('click', () => {
+            let diScoreA = 0;
+            let diScoreB = 0;
+
+            diIndicators.forEach(indicator => {
+                const valA = parseFloat(document.getElementById(`di_${indicator.id}_A`).value) || 0;
+                const valB = parseFloat(document.getElementById(`di_${indicator.id}_B`).value) || 0;
+                diScoreA += valA * indicator.weight;
+                diScoreB += valB * indicator.weight;
+            });
+
+            const aspectAName = document.getElementById('aspectAName').value || '方面 A';
+            const aspectBName = document.getElementById('aspectBName').value || '方面 B';
+            
+            document.getElementById('di-result-title').classList.remove('hidden');
+
+            const ctx = document.getElementById('diChart').getContext('2d');
+            if (diChartInstance) {
+                diChartInstance.destroy();
+            }
+            diChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [aspectAName, aspectBName],
+                    datasets: [{
+                        label: '支配力指数 (DI)',
+                        data: [diScoreA, diScoreB],
+                        backgroundColor: [
+                            'rgba(239, 68, 68, 0.6)', // red-500
+                            'rgba(34, 197, 94, 0.6)'  // green-500
+                        ],
+                        borderColor: [
+                            'rgba(239, 68, 68, 1)',
+                            'rgba(34, 197, 94, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: true, title: { display: true, text: '综合得分' } } },
+                     plugins: {
+                        legend: { display: false } // Hide legend if only one dataset and labels are clear
+                    }
+                }
+            });
+
+            const interpretationEl = document.getElementById('di-interpretation');
+            if (diScoreA > diScoreB) {
+                interpretationEl.textContent = `"${aspectAName}" (得分: ${diScoreA.toFixed(2)}) 是当前的主要方面。`;
+                interpretationEl.className = "mt-4 text-lg font-semibold text-center text-red-600";
+            } else if (diScoreB > diScoreA) {
+                interpretationEl.textContent = `"${aspectBName}" (得分: ${diScoreB.toFixed(2)}) 是当前的主要方面。`;
+                interpretationEl.className = "mt-4 text-lg font-semibold text-center text-green-600";
+            } else {
+                interpretationEl.textContent = `双方力量均衡 (得分均为: ${diScoreA.toFixed(2)})。`;
+                interpretationEl.className = "mt-4 text-lg font-semibold text-center text-slate-700";
+            }
+        });
+
+        // Dynamics & Transformation section
+        let transformOldVal = 70;
+        let transformNewVal = 30;
+        const transformOldLabel = document.getElementById('transformAspectOldLabel');
+        const transformNewLabel = document.getElementById('transformAspectNewLabel');
+        const transformOldScoreEl = document.getElementById('transformOldScore');
+        const transformNewScoreEl = document.getElementById('transformNewScore');
+        const transformOldBarEl = document.getElementById('transformOldBar');
+        const transformNewBarEl = document.getElementById('transformNewBar');
+        const transformationStatusEl = document.getElementById('transformation-status');
+
+        document.getElementById('simulate-change-btn').addEventListener('click', () => {
+            if (transformNewVal < 100) {
+                transformNewVal += 10;
+                transformOldVal -= 10;
+
+                if (transformNewVal > 100) transformNewVal = 100;
+                if (transformOldVal < 0) transformOldVal = 0;
+                
+                transformOldScoreEl.textContent = transformOldVal;
+                transformNewScoreEl.textContent = transformNewVal;
+                transformOldBarEl.style.width = `${transformOldVal}%`;
+                transformOldBarEl.textContent = `${transformOldVal}%`;
+                transformNewBarEl.style.width = `${transformNewVal}%`;
+                transformNewBarEl.textContent = `${transformNewVal}%`;
+
+
+                if (transformNewVal > transformOldVal) {
+                    transformationStatusEl.textContent = "“新制度”已取得支配地位！发生了质变。";
+                    transformationStatusEl.className = "mt-3 text-center font-semibold text-green-600";
+                } else if (transformNewVal === transformOldVal) {
+                    transformationStatusEl.textContent = "“新制度”与“旧制度”力量均衡，处于转化临界点。";
+                     transformationStatusEl.className = "mt-3 text-center font-semibold text-yellow-600";
+                }
+                 else {
+                    transformationStatusEl.textContent = "“新制度”力量增强，但“旧制度”仍占支配。";
+                    transformationStatusEl.className = "mt-3 text-center font-semibold text-red-600";
+                }
+            } else {
+                 transformationStatusEl.textContent = "“新制度”已完全取代“旧制度”。";
+                 transformationStatusEl.className = "mt-3 text-center font-semibold text-green-600";
+            }
+        });
+
+
+        // Initial setup
+        switchTab('introduction');
+        renderCinInputs(); // Initialize CIN inputs
+        document.getElementById('calculate-cin-btn').click(); // Initial calculation for CIN
+        renderDiInputs(); // Initialize DI inputs
+        document.getElementById('calculate-di-btn').click(); // Initial calculation for DI
+    </script>
+
+</body>
+</html>
